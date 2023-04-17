@@ -1,0 +1,2 @@
+# Ignore the .xlsx file with books link -> Only need .csv file
+*.xlsx
