@@ -1,2 +1,5 @@
 # Ignore the .xlsx file with books link -> Only need .csv file
 *.xlsx
+
+# Ignore all __pycache__ directories that may be created in execution
+__pycache__
