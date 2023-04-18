@@ -5,3 +5,4 @@
 __pycache__
 
 # Ignore downloads_test directory -> This directory only has testing purposes
+downloads_test/
