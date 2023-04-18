@@ -3,3 +3,5 @@
 
 # Ignore all __pycache__ directories that may be created in execution
 __pycache__
+
+# Ignore downloads_test directory -> This directory only has testing purposes
