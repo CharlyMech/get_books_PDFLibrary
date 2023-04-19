@@ -4,12 +4,19 @@ from requests import get, codes
 from bs4 import BeautifulSoup
 # Import loads() method from json -> Work with JSON object from OpenLibra's API
 from json import loads
+
+
 def get_book_content(url:str) -> dict:
     get_url = get(url)
     if get_url.status_code == codes.ok: # Check if the request was successful
         page = get_url.text # Get HTML content
 
         soup = BeautifulSoup(page, 'html.parser') # Create the scrapper html parser
+
+        # Check if the Dowload button has the property 'data-action="download-warning"' that we are interested on
+        if soup.select('a[title="Download Book (SHIFT + S)"]')[0].get('data-action') != "download-warning":
+            return
+
         title = soup.select(
             '.book-cover-wrapper > img')[0].get('alt').lower() # Select the Title element and turn lower case
 
@@ -64,3 +71,4 @@ if __name__ == "__main__":
 
     test = get_book_content("https://openlibra.com/en/book/interface-circuits-for-microsensor-integrated-systems-2")
     print(test)
+    
