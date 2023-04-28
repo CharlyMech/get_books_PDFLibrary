@@ -4,7 +4,15 @@ from requests import get, codes
 from bs4 import BeautifulSoup
 # Import loads() method from json -> Work with JSON object from OpenLibra's API
 from json import loads
+# Import randint() method from random -> Generate random number between 1 - 3 to assign tier to books
+from random import randint
 
+def gen_random_tier() -> int:
+    # Free tier - 1 ; Pro Tier - 2, Premium Tier - 3
+    # Generate a random value to assign tier to each book
+    return randint(1, 3)
+
+    
 
 def get_book_content(url:str) -> dict:
     get_url = get(url)
@@ -13,62 +21,63 @@ def get_book_content(url:str) -> dict:
 
         soup = BeautifulSoup(page, 'html.parser') # Create the scrapper html parser
 
-        # Check if the Dowload button has the property 'data-action="download-warning"' that we are interested on
-        if soup.select('a[title="Download Book (SHIFT + S)"]')[0].get('data-action') != "download-warning":
-            return
+        # # Check if the Dowload button has the property 'data-action="download-warning"' that we are interested on
+        # if soup.select('a[title="Download Book (SHIFT + S)"]')[0].get('data-action') != "download-warning":
+        #     return
 
-        title = soup.select(
-            '.book-cover-wrapper > img')[0].get('alt').lower() # Select the Title element and turn lower case
+        selct_title = soup.select('.book-cover-wrapper > img')
+        if len(selct_title) == 0:
+            return {}
 
-        get_book_api = loads(get(
-            f'https://www.etnassoft.com/api/v1/get/?book_title="{title}"').text) # API connection
+        title = selct_title[0].get('alt') # Select the Title element
 
-        
-        book_id = get_book_api[0]['ID'] # Book's ID
-        book_title = get_book_api[0]['title'] # Book's Title
-        author_name = get_book_api[0]['author'] # Book's Author -> cannot access to author_id, so queries will be based on author's name (using LIKE)
-        description = get_book_api[0]['content'] # Book's Description
-        publisher = get_book_api[0]['publisher'] # Book's Publisher
-        year = get_book_api[0]['publisher_date'] # Book's publication year -> publisher year
-        n_pages = get_book_api[0]['pages'] # Book's number of pages
-        lang = get_book_api[0]['language'] # Book's language
-        categories = get_book_api[0]['categories'] # Book's Categories List
-        # Book's Cover Image URL
-        cover = get_book_api[0]['cover']
-        cover_extension = cover.split(".")[-1]
-        # Book's Thumbnail Image URL
-        thumbnail = get_book_api[0]['thumbnail']
-        thumbnail_extension = thumbnail.split(".")[-1]
-        # Book's PDF URL
-        download_url = soup.select('a[title="Download Book (SHIFT + S)"]')[0].get('href')
+        # Verify (just in case) if the API url exists
+        get_book_api = get(f'https://www.etnassoft.com/api/v1/get/?book_title="{title}"')
+        if get_book_api.status_code == codes.ok:
+            book_api = loads(get_book_api.text)
 
+            if len(book_api) == 0:
+                return {}
 
-        # Return a dictionary with all information 
-        book = {
-            "id": book_id,
-            "title": book_title,
-            "author": author_name,
-            "description": description,
-            "publisher": publisher,
-            "year": year,
-            "pages": n_pages,
-            "lang": lang,
-            "categories": categories,
-            "cover": cover,
-            "thumbnail": thumbnail,
-            "pdf": download_url
-        }
-        
-        return book
+            # Remove "\r\n" characters from description
+            descr = str(book_api[0]['content']).replace("\r\n\r\n", " ")
+
+            # Check if Authors or Categories return 0, and if so set a default value
+            author_id = write_authors_name(book_api[0]['author'])
+
+            categories_list_str =  return_categories_list_str(book_api[0]['categories'])
+
+            # Create a Dictionary with all info needed about the book 
+            book = {
+                "ID": book_api[0]['ID'], # Book's ID
+                "title": book_api[0]['title'], # Book's Title
+                "author": author_id, # Book's Author ID -> Note that (repeating) the relation between tables is set to 1-N instead of N-N because of OpenLibra's authors system
+                "description": descr, # Book's Description
+                "publisher": book_api[0]['publisher'], # Book's Publisher
+                "year": book_api[0]['publisher_date'], # Book's publication year -> publisher year
+                "pages": book_api[0]['pages'], # Book's number of pages
+                "lang": book_api[0]['language'], # Book's language
+                "categories": categories_list_str, # Book's Categories List turned into str
+                "cover": book_api[0]['cover'], # Book's Cover
+                "cover_extension": book_api[0]['cover'].split(".")[-1], # Book's Cover extension for saving file (future)
+                "thumbnail": book_api[0]['thumbnail'], # Book's Thumbnail (smaller cover image)
+                "thumbnail_extension": book_api[0]['thumbnail'].split(".")[-1], # Book's Thumbnail extension for saving file (future)
+                "pdf": soup.select('a[title="Download Book (SHIFT + S)"]')[0].get('href'),
+                "tier": gen_random_tier()
+            }
+            
+            # Return the Book's dictionary
+            return book
+        else:
+            # Void return in case the API connection didn't work
+            return {}
 
 
 
 if __name__ == "__main__":
-    # Open the CSV file & store all URL in a single list
-    # books = list(open("books.csv", "r").read().split("\n"))
+    # Open & close the CSV file & store all URL in a single list
+    books = open("url.csv", mode='r', encoding='utf-8-sig')
+    books_list = books.read().split("\n")
+    books.close()
     # Remove the last element since it is empty
-    # books.pop()
-
-    test = get_book_content("https://openlibra.com/en/book/interface-circuits-for-microsensor-integrated-systems-2")
-    print(test)
-    
+    books_list.pop()
