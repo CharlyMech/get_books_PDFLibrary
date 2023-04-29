@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS testLibrary.users (
 	-- Constraints
 	CONSTRAINT PK_ID_USERS PRIMARY KEY (user_id),
 	CONSTRAINT UQ_MAIL_USERS UNIQUE (mail),
-	CONSTRAINT FK_ID_TIERS FOREIGN KEY (tier_id) REFERENCES Library.tiers(tier_id)
+	CONSTRAINT FK_ID_TIERS FOREIGN KEY (tier_id) REFERENCES testLibrary.tiers(tier_id)
 );
 
 
