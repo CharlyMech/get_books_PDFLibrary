@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS Library.users (
 	-- Constraints
 	CONSTRAINT PK_ID_USERS PRIMARY KEY (user_id),
 	CONSTRAINT UQ_MAIL_USERS UNIQUE (mail),
-	CONSTRAINT FK_ID_TIERS FOREIGN KEY (tier_id) REFERENCES Library.tiers(tier_id)
+	CONSTRAINT FK_ID_TIERS_USERS FOREIGN KEY (tier_id) REFERENCES Library.tiers(tier_id)
 		ON UPDATE CASCADE 
 	-- No need constraints for tiers
 );
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS Library.books (
 	CONSTRAINT PK_ID_BOOKS PRIMARY KEY (book_id),
 	CONSTRAINT FK_ID_AUTHORS FOREIGN KEY (author_id) REFERENCES Library.authors(author_id)
 		ON DELETE SET DEFAULT ON UPDATE CASCADE,
-	CONSTRAINT FK_ID_TIERS FOREIGN KEY (tier_id) REFERENCES Library.tiers(tier_id)
+	CONSTRAINT FK_ID_TIERS_BOOKS FOREIGN KEY (tier_id) REFERENCES Library.tiers(tier_id)
 	-- No need constraints for Tiers
 );
 
