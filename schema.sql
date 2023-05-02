@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Library.authors (
 	-- Attributes
 	author_id INT NOT NULL AUTO_INCREMENT,
 	author_name varchar(100) NOT NULL,
-	n_books DEFAULT 1,
+	n_books INT DEFAULT 1,
 	-- Constraints
 	CONSTRAINT PK_ID_AUTHORS PRIMARY KEY (author_id)
 );
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS Library.books (
 	cover VARCHAR(255) NOT NULL,
 	thumbnail VARCHAR(255) NOT NULL,
 	pdf VARCHAR(255) NOT NULL,
-	tier_id INT NOT NULL
+	tier_id INT NOT NULL,
 	-- Constraints
 	CONSTRAINT PK_ID_BOOKS PRIMARY KEY (book_id),
 	CONSTRAINT FK_ID_AUTHORS FOREIGN KEY (author_id) REFERENCES Library.authors(author_id)
