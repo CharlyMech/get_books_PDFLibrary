@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS Library.tiers (
 CREATE TABLE IF NOT EXISTS Library.categories (
 	-- Attributes
 	cat_id INT NOT NULL,
-	cat_name VARCHAR(25) NOT NULL,
+	cat_name VARCHAR(100) NOT NULL,
 	n_books INT DEFAULT 1,
 	-- Constraints
 	CONSTRAINT PK_ID_CATEGORIES PRIMARY KEY (cat_id)
